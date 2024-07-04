@@ -1,0 +1,69 @@
+## SegRoadv2 for road extraction
+
+#### 训练自己的数据集
+1、讲数据整理放入model_data/train_val路径下，如train.txt和test.txt,格式如下：
+```python
+/root/autodl-tmp/patent/Massachusetts/test/images_croped/988_512_23429080_15_sat.jpg /root/autodl-tmp/patent/Massachusetts/test/labels_croped/988_512_23429080_15_mask.png
+/root/autodl-tmp/patent/Massachusetts/test/images_croped/988_0_20278885_15_sat.jpg /root/autodl-tmp/patent/Massachusetts/test/labels_croped/988_0_20278885_15_mask.png
+```
+    
+2、运行train.py即可开始训练。
+tip: train.py可以用于pretrain,实际的训练可以使用train_finetune_deep.py
+
+
+### 预测步骤
+1、按照训练步骤训练。    
+2、在segformer.py文件里面，在如下部分修改model_path、num_classes、backbone使其对应训练好的文件；**model_path对应logs文件夹下面的权值文件，num_classes代表要预测的类的数量加1，backbone是所使用的主干特征提取网络**。    
+```python
+_defaults = {
+    #-------------------------------------------------------------------#
+    #   model_path指向logs文件夹下的权值文件
+    #   训练好后logs文件夹下存在多个权值文件，选择验证集损失较低的即可。
+    #   验证集损失较低不代表miou较高，仅代表该权值在验证集上泛化性能较好。
+    #-------------------------------------------------------------------#
+    "model_path"        : "model_data/segformer_b0_weights_voc.pth",
+    #----------------------------------------#
+    #   所需要区分的类的个数+1
+    #----------------------------------------#
+    "num_classes"       : 21,
+    #----------------------------------------#
+    #   所使用的的主干网络：
+    #   b0、b1、b2、b3、b4、b5
+    #----------------------------------------#
+    "phi"               : "b0",
+    #----------------------------------------#
+    #   输入图片的大小
+    #----------------------------------------#
+    "input_shape"       : [512, 512],
+    #-------------------------------------------------#
+    #   mix_type参数用于控制检测结果的可视化方式
+    #
+    #   mix_type = 0的时候代表原图与生成的图进行混合
+    #   mix_type = 1的时候代表仅保留生成的图
+    #   mix_type = 2的时候代表仅扣去背景，仅保留原图中的目标
+    #-------------------------------------------------#
+    "mix_type"          : 0,
+    #-------------------------------#
+    #   是否使用Cuda
+    #   没有GPU可以设置成False
+    #-------------------------------#
+    "cuda"              : True,
+}
+```
+3、运行predict.py，输入    
+```python
+img/street.jpg
+```
+可完成预测。    
+
+
+### 评估步骤
+1、设置get_miou_deep.py里面的num_classes为预测的类的数量加1。  
+2、设置get_miou_deep.py里面的name_classes为需要去区分的类别。  
+3、运行get_miou_deep.py即可获得miou大小。  
+
+### Reference
+https://github.com/bubbliiiing/segformer-pytorch
+https://github.com/ggyyzm/pytorch_segmentation  
+https://github.com/bonlime/keras-deeplab-v3-plus
+https://github.com/NVlabs/SegFormer
