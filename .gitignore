@@ -5,9 +5,13 @@ VOCdevkit/
 datasets/
 Medical_Datasets/
 lfw/
+
 logs/*
 logs_chn6/*
 logs_mass/*
+!logs/
+!logs_chn6/
+!logs_mass/
 model_data/*.pth
 model_data/train_val/*.txt
 .temp_map_out/
